@@ -4,7 +4,7 @@ import "time"
 
 // EBPFDiagnosticsSchemaVersion versions the complete GetEBPFDiagnostics
 // response. It remains available even when no eBPF inbound is running.
-const EBPFDiagnosticsSchemaVersion = 18
+const EBPFDiagnosticsSchemaVersion = 19
 
 // EBPFDiagnosticsProvider exposes a running inbound's eBPF state to the
 // sing-box API without coupling the API service to the optional eBPF package.
@@ -35,18 +35,21 @@ type EBPFMapOccupancyDiagnostics struct {
 }
 
 type EBPFMapDiagnostics struct {
-	ID         uint32
-	Name       string
-	Category   string
-	Type       string
-	MaxEntries uint32
-	KeySize    uint32
-	ValueSize  uint32
-	Flags      uint32
-	Entries    uint32
-	Supported  bool
-	Error      string
-	Pressure   string
+	ID                uint32
+	Name              string
+	Category          string
+	Type              string
+	MaxEntries        uint32
+	KeySize           uint32
+	ValueSize         uint32
+	Flags             uint32
+	Entries           uint32
+	Supported         bool
+	Error             string
+	Pressure          string
+	OccupancyMode     string
+	EvictionMode      string
+	AdmissionCritical bool
 }
 
 type EBPFRuntimeDiagnostics struct {

@@ -567,18 +567,21 @@ func kernelRuntimeForAPI(observedAt time.Time, runtimeState commonEBPF.RuntimeSt
 	maps := make([]adapter.EBPFMapDiagnostics, 0, len(runtimeState.MapOccupancy.Maps))
 	for _, item := range runtimeState.MapOccupancy.Maps {
 		maps = append(maps, adapter.EBPFMapDiagnostics{
-			ID:         uint32(item.ID),
-			Name:       item.Name,
-			Category:   string(item.Category),
-			Type:       item.Type,
-			MaxEntries: item.MaxEntries,
-			KeySize:    item.KeySize,
-			ValueSize:  item.ValueSize,
-			Flags:      item.Flags,
-			Entries:    item.Entries,
-			Supported:  item.Supported,
-			Error:      item.Error,
-			Pressure:   item.Pressure,
+			ID:                uint32(item.ID),
+			Name:              item.Name,
+			Category:          string(item.Category),
+			Type:              item.Type,
+			MaxEntries:        item.MaxEntries,
+			KeySize:           item.KeySize,
+			ValueSize:         item.ValueSize,
+			Flags:             item.Flags,
+			Entries:           item.Entries,
+			Supported:         item.Supported,
+			Error:             item.Error,
+			Pressure:          item.Pressure,
+			OccupancyMode:     item.OccupancyMode,
+			EvictionMode:      item.EvictionMode,
+			AdmissionCritical: item.AdmissionCritical,
 		})
 	}
 	diagnostics := adapter.EBPFKernelRuntimeDiagnostics{

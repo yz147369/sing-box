@@ -7711,21 +7711,24 @@ func (x *EBPFMapOccupancyDiagnostics) GetError() string {
 }
 
 type EBPFMapDiagnostics struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            uint32                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Type          string                 `protobuf:"bytes,3,opt,name=type,proto3" json:"type,omitempty"`
-	MaxEntries    uint32                 `protobuf:"varint,4,opt,name=maxEntries,proto3" json:"maxEntries,omitempty"`
-	KeySize       uint32                 `protobuf:"varint,5,opt,name=keySize,proto3" json:"keySize,omitempty"`
-	ValueSize     uint32                 `protobuf:"varint,6,opt,name=valueSize,proto3" json:"valueSize,omitempty"`
-	Flags         uint32                 `protobuf:"varint,7,opt,name=flags,proto3" json:"flags,omitempty"`
-	Entries       uint32                 `protobuf:"varint,8,opt,name=entries,proto3" json:"entries,omitempty"`
-	Supported     bool                   `protobuf:"varint,9,opt,name=supported,proto3" json:"supported,omitempty"`
-	Error         string                 `protobuf:"bytes,10,opt,name=error,proto3" json:"error,omitempty"`
-	Pressure      string                 `protobuf:"bytes,11,opt,name=pressure,proto3" json:"pressure,omitempty"`
-	Category      string                 `protobuf:"bytes,12,opt,name=category,proto3" json:"category,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	Id                uint32                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name              string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Type              string                 `protobuf:"bytes,3,opt,name=type,proto3" json:"type,omitempty"`
+	MaxEntries        uint32                 `protobuf:"varint,4,opt,name=maxEntries,proto3" json:"maxEntries,omitempty"`
+	KeySize           uint32                 `protobuf:"varint,5,opt,name=keySize,proto3" json:"keySize,omitempty"`
+	ValueSize         uint32                 `protobuf:"varint,6,opt,name=valueSize,proto3" json:"valueSize,omitempty"`
+	Flags             uint32                 `protobuf:"varint,7,opt,name=flags,proto3" json:"flags,omitempty"`
+	Entries           uint32                 `protobuf:"varint,8,opt,name=entries,proto3" json:"entries,omitempty"`
+	Supported         bool                   `protobuf:"varint,9,opt,name=supported,proto3" json:"supported,omitempty"`
+	Error             string                 `protobuf:"bytes,10,opt,name=error,proto3" json:"error,omitempty"`
+	Pressure          string                 `protobuf:"bytes,11,opt,name=pressure,proto3" json:"pressure,omitempty"`
+	Category          string                 `protobuf:"bytes,12,opt,name=category,proto3" json:"category,omitempty"`
+	OccupancyMode     string                 `protobuf:"bytes,13,opt,name=occupancyMode,proto3" json:"occupancyMode,omitempty"`
+	EvictionMode      string                 `protobuf:"bytes,14,opt,name=evictionMode,proto3" json:"evictionMode,omitempty"`
+	AdmissionCritical bool                   `protobuf:"varint,15,opt,name=admissionCritical,proto3" json:"admissionCritical,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *EBPFMapDiagnostics) Reset() {
@@ -7840,6 +7843,27 @@ func (x *EBPFMapDiagnostics) GetCategory() string {
 		return x.Category
 	}
 	return ""
+}
+
+func (x *EBPFMapDiagnostics) GetOccupancyMode() string {
+	if x != nil {
+		return x.OccupancyMode
+	}
+	return ""
+}
+
+func (x *EBPFMapDiagnostics) GetEvictionMode() string {
+	if x != nil {
+		return x.EvictionMode
+	}
+	return ""
+}
+
+func (x *EBPFMapDiagnostics) GetAdmissionCritical() bool {
+	if x != nil {
+		return x.AdmissionCritical
+	}
+	return false
 }
 
 type EBPFInboundDiagnostics struct {
@@ -9781,7 +9805,7 @@ const file_daemon_started_service_proto_rawDesc = "" +
 	"\x1bEBPFMapOccupancyDiagnostics\x12\x16\n" +
 	"\x06status\x18\x01 \x01(\tR\x06status\x12.\n" +
 	"\x04maps\x18\x02 \x03(\v2\x1a.daemon.EBPFMapDiagnosticsR\x04maps\x12\x14\n" +
-	"\x05error\x18\x03 \x01(\tR\x05error\"\xc0\x02\n" +
+	"\x05error\x18\x03 \x01(\tR\x05error\"\xb8\x03\n" +
 	"\x12EBPFMapDiagnostics\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\rR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x12\n" +
@@ -9797,7 +9821,10 @@ const file_daemon_started_service_proto_rawDesc = "" +
 	"\x05error\x18\n" +
 	" \x01(\tR\x05error\x12\x1a\n" +
 	"\bpressure\x18\v \x01(\tR\bpressure\x12\x1a\n" +
-	"\bcategory\x18\f \x01(\tR\bcategory\"\xff\x1f\n" +
+	"\bcategory\x18\f \x01(\tR\bcategory\x12$\n" +
+	"\roccupancyMode\x18\r \x01(\tR\roccupancyMode\x12\"\n" +
+	"\fevictionMode\x18\x0e \x01(\tR\fevictionMode\x12,\n" +
+	"\x11admissionCritical\x18\x0f \x01(\bR\x11admissionCritical\"\xff\x1f\n" +
 	"\x16EBPFInboundDiagnostics\x12\x1e\n" +
 	"\n" +
 	"observedAt\x18\x02 \x01(\x03R\n" +
