@@ -160,6 +160,12 @@ func marshalEBPFDiagnostics(source adapter.EBPFRuntimeDiagnostics) *EBPFInboundD
 			SocketReleaseMatched:           source.UDPNAT.SocketReleaseMatched,
 			PendingReleaseCapacityRejected: source.UDPNAT.PendingReleaseCapacityRejected,
 			ReleaseNotificationDrops:       source.UDPNAT.ReleaseNotificationDrops,
+			RedirectAdmissionFailures:      source.UDPNAT.RedirectAdmissionFailures,
+			UdpTokenAdmissionFailures:      source.UDPNAT.UDPTokenAdmissionFailures,
+			UdpTokenReverseFailures:        source.UDPNAT.UDPTokenReverseFailures,
+			UdpPeerAdmissionFailures:       source.UDPNAT.UDPPeerAdmissionFailures,
+			TcpPeerAdmissionFailures:       source.UDPNAT.TCPPeerAdmissionFailures,
+			UdpRecoveryAdmissionFailures:   source.UDPNAT.UDPRecoveryAdmissionFailures,
 		},
 		UdpReplySockets: &EBPFUDPReplySocketDiagnostics{
 			Count:            source.UDPReplySockets.Count,

@@ -7,9 +7,9 @@
 package daemon
 
 import (
+	empty "github.com/golang/protobuf/ptypes/empty"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -9020,6 +9020,12 @@ type EBPFUDPNATDiagnostics struct {
 	SocketReleaseMatched           uint64                 `protobuf:"varint,6,opt,name=socketReleaseMatched,proto3" json:"socketReleaseMatched,omitempty"`
 	PendingReleaseCapacityRejected uint64                 `protobuf:"varint,7,opt,name=pendingReleaseCapacityRejected,proto3" json:"pendingReleaseCapacityRejected,omitempty"`
 	ReleaseNotificationDrops       uint64                 `protobuf:"varint,8,opt,name=releaseNotificationDrops,proto3" json:"releaseNotificationDrops,omitempty"`
+	RedirectAdmissionFailures      uint64                 `protobuf:"varint,9,opt,name=redirectAdmissionFailures,proto3" json:"redirectAdmissionFailures,omitempty"`
+	UdpTokenAdmissionFailures      uint64                 `protobuf:"varint,10,opt,name=udpTokenAdmissionFailures,proto3" json:"udpTokenAdmissionFailures,omitempty"`
+	UdpTokenReverseFailures        uint64                 `protobuf:"varint,11,opt,name=udpTokenReverseFailures,proto3" json:"udpTokenReverseFailures,omitempty"`
+	UdpPeerAdmissionFailures       uint64                 `protobuf:"varint,12,opt,name=udpPeerAdmissionFailures,proto3" json:"udpPeerAdmissionFailures,omitempty"`
+	TcpPeerAdmissionFailures       uint64                 `protobuf:"varint,13,opt,name=tcpPeerAdmissionFailures,proto3" json:"tcpPeerAdmissionFailures,omitempty"`
+	UdpRecoveryAdmissionFailures   uint64                 `protobuf:"varint,14,opt,name=udpRecoveryAdmissionFailures,proto3" json:"udpRecoveryAdmissionFailures,omitempty"`
 	unknownFields                  protoimpl.UnknownFields
 	sizeCache                      protoimpl.SizeCache
 }
@@ -9106,6 +9112,48 @@ func (x *EBPFUDPNATDiagnostics) GetPendingReleaseCapacityRejected() uint64 {
 func (x *EBPFUDPNATDiagnostics) GetReleaseNotificationDrops() uint64 {
 	if x != nil {
 		return x.ReleaseNotificationDrops
+	}
+	return 0
+}
+
+func (x *EBPFUDPNATDiagnostics) GetRedirectAdmissionFailures() uint64 {
+	if x != nil {
+		return x.RedirectAdmissionFailures
+	}
+	return 0
+}
+
+func (x *EBPFUDPNATDiagnostics) GetUdpTokenAdmissionFailures() uint64 {
+	if x != nil {
+		return x.UdpTokenAdmissionFailures
+	}
+	return 0
+}
+
+func (x *EBPFUDPNATDiagnostics) GetUdpTokenReverseFailures() uint64 {
+	if x != nil {
+		return x.UdpTokenReverseFailures
+	}
+	return 0
+}
+
+func (x *EBPFUDPNATDiagnostics) GetUdpPeerAdmissionFailures() uint64 {
+	if x != nil {
+		return x.UdpPeerAdmissionFailures
+	}
+	return 0
+}
+
+func (x *EBPFUDPNATDiagnostics) GetTcpPeerAdmissionFailures() uint64 {
+	if x != nil {
+		return x.TcpPeerAdmissionFailures
+	}
+	return 0
+}
+
+func (x *EBPFUDPNATDiagnostics) GetUdpRecoveryAdmissionFailures() uint64 {
+	if x != nil {
+		return x.UdpRecoveryAdmissionFailures
 	}
 	return 0
 }
@@ -9990,7 +10038,7 @@ const file_daemon_started_service_proto_rawDesc = "" +
 	"\x11tcReturnConflicts\x18\x15 \x01(\x04R\x11tcReturnConflicts\x126\n" +
 	"\x16tcReturnLookupFailures\x18\x16 \x01(\x04R\x16tcReturnLookupFailuresJ\x04\b\t\x10\n" +
 	"J\x04\b\n" +
-	"\x10\v\"\xa1\x03\n" +
+	"\x10\v\"\x93\x06\n" +
 	"\x15EBPFUDPNATDiagnostics\x12&\n" +
 	"\x0eactiveSessions\x18\x01 \x01(\x03R\x0eactiveSessions\x12(\n" +
 	"\x0fcreatedSessions\x18\x02 \x01(\x04R\x0fcreatedSessions\x12,\n" +
@@ -10001,7 +10049,14 @@ const file_daemon_started_service_proto_rawDesc = "" +
 	"\x13socketReleaseEvents\x18\x05 \x01(\x04R\x13socketReleaseEvents\x122\n" +
 	"\x14socketReleaseMatched\x18\x06 \x01(\x04R\x14socketReleaseMatched\x12F\n" +
 	"\x1ependingReleaseCapacityRejected\x18\a \x01(\x04R\x1ependingReleaseCapacityRejected\x12:\n" +
-	"\x18releaseNotificationDrops\x18\b \x01(\x04R\x18releaseNotificationDrops\"\xda\x01\n" +
+	"\x18releaseNotificationDrops\x18\b \x01(\x04R\x18releaseNotificationDrops\x12<\n" +
+	"\x19redirectAdmissionFailures\x18\t \x01(\x04R\x19redirectAdmissionFailures\x12<\n" +
+	"\x19udpTokenAdmissionFailures\x18\n" +
+	" \x01(\x04R\x19udpTokenAdmissionFailures\x128\n" +
+	"\x17udpTokenReverseFailures\x18\v \x01(\x04R\x17udpTokenReverseFailures\x12:\n" +
+	"\x18udpPeerAdmissionFailures\x18\f \x01(\x04R\x18udpPeerAdmissionFailures\x12:\n" +
+	"\x18tcpPeerAdmissionFailures\x18\r \x01(\x04R\x18tcpPeerAdmissionFailures\x12B\n" +
+	"\x1cudpRecoveryAdmissionFailures\x18\x0e \x01(\x04R\x1cudpRecoveryAdmissionFailures\"\xda\x01\n" +
 	"\x1aEBPFPolicyEpochDiagnostics\x12&\n" +
 	"\x0elocalConfirmed\x18\x01 \x01(\x04R\x0elocalConfirmed\x12$\n" +
 	"\rlocalExpected\x18\x02 \x01(\x04R\rlocalExpected\x12(\n" +
@@ -10216,7 +10271,7 @@ var file_daemon_started_service_proto_goTypes = []any{
 	(*Log_Message)(nil),                       // 121: daemon.Log.Message
 	nil,                                       // 122: daemon.OpenConnectAuthFormResponse.ValuesEntry
 	nil,                                       // 123: daemon.EBPFBypassRuleSetDiagnostics.BackendStateEntry
-	(*emptypb.Empty)(nil),                     // 124: google.protobuf.Empty
+	(*empty.Empty)(nil),                       // 124: google.protobuf.Empty
 }
 var file_daemon_started_service_proto_depIdxs = []int32{
 	4,   // 0: daemon.ServiceStatus.status:type_name -> daemon.ServiceStatus.Type
