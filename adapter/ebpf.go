@@ -170,6 +170,12 @@ type EBPFUDPNATDiagnostics struct {
 	SocketReleaseMatched           uint64
 	PendingReleaseCapacityRejected uint64
 	ReleaseNotificationDrops       uint64
+	RedirectAdmissionFailures      uint64
+	UDPTokenAdmissionFailures      uint64
+	UDPTokenReverseFailures        uint64
+	UDPPeerAdmissionFailures       uint64
+	TCPPeerAdmissionFailures       uint64
+	UDPRecoveryAdmissionFailures   uint64
 }
 
 type EBPFAttachmentDiagnostics struct {

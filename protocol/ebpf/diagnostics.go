@@ -96,6 +96,12 @@ type UDPNATDiagnostics struct {
 	SocketReleaseMatched           uint64 `json:"socket_release_matched"`
 	PendingReleaseCapacityRejected uint64 `json:"pending_release_capacity_rejected"`
 	ReleaseNotificationDrops       uint64 `json:"release_notification_drops"`
+	RedirectAdmissionFailures      uint64 `json:"redirect_admission_failures,omitempty"`
+	UDPTokenAdmissionFailures      uint64 `json:"udp_token_admission_failures,omitempty"`
+	UDPTokenReverseFailures        uint64 `json:"udp_token_reverse_failures,omitempty"`
+	UDPPeerAdmissionFailures       uint64 `json:"udp_peer_admission_failures,omitempty"`
+	TCPPeerAdmissionFailures       uint64 `json:"tcp_peer_admission_failures,omitempty"`
+	UDPRecoveryAdmissionFailures   uint64 `json:"udp_recovery_admission_failures,omitempty"`
 }
 
 func (d *UDPNATDiagnostics) add(other UDPNATDiagnostics) {
@@ -107,6 +113,12 @@ func (d *UDPNATDiagnostics) add(other UDPNATDiagnostics) {
 	d.SocketReleaseMatched += other.SocketReleaseMatched
 	d.PendingReleaseCapacityRejected += other.PendingReleaseCapacityRejected
 	d.ReleaseNotificationDrops += other.ReleaseNotificationDrops
+	d.RedirectAdmissionFailures += other.RedirectAdmissionFailures
+	d.UDPTokenAdmissionFailures += other.UDPTokenAdmissionFailures
+	d.UDPTokenReverseFailures += other.UDPTokenReverseFailures
+	d.UDPPeerAdmissionFailures += other.UDPPeerAdmissionFailures
+	d.TCPPeerAdmissionFailures += other.TCPPeerAdmissionFailures
+	d.UDPRecoveryAdmissionFailures += other.UDPRecoveryAdmissionFailures
 }
 
 // EBPFDiagnostics is one running eBPF inbound's actual interception state,
@@ -855,6 +867,19 @@ func (i *Inbound) Diagnostics() EBPFDiagnostics {
 		if drops, err := backend.UDPReleaseNotificationDrops(); err == nil {
 			diagnostics.UDPNAT.ReleaseNotificationDrops = drops
 		}
+		readStat := func(stat commonEBPF.CgroupUDPStat) uint64 {
+			value, err := backend.UDPReleaseStat(stat)
+			if err != nil {
+				return 0
+			}
+			return value
+		}
+		diagnostics.UDPNAT.RedirectAdmissionFailures = readStat(commonEBPF.CgroupUDPStatTCPRedirectFailure) + readStat(commonEBPF.CgroupUDPStatUDPRedirectFailure)
+		diagnostics.UDPNAT.UDPTokenAdmissionFailures = readStat(commonEBPF.CgroupUDPStatUDPTokenFailure)
+		diagnostics.UDPNAT.UDPTokenReverseFailures = readStat(commonEBPF.CgroupUDPStatUDPTokenReverseFailure)
+		diagnostics.UDPNAT.UDPPeerAdmissionFailures = readStat(commonEBPF.CgroupUDPStatUDPPeerFailure)
+		diagnostics.UDPNAT.TCPPeerAdmissionFailures = readStat(commonEBPF.CgroupUDPStatTCPPeerFailure)
+		diagnostics.UDPNAT.UDPRecoveryAdmissionFailures = readStat(commonEBPF.CgroupUDPStatUDPRecoveryFailure)
 	}
 	diagnostics.UDPReplySockets = i.udpReplySockets.snapshot()
 
