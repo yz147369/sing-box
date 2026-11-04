@@ -167,6 +167,9 @@ type EBPFDiagnostics struct {
 	TCAssignmentSweepFailureMap   string     `json:"tc_assignment_sweep_failure_map"`
 	TCAssignmentSweepScanned      uint64     `json:"tc_assignment_sweep_scanned,omitempty"`
 	TCAssignmentSweepRemoved      uint64     `json:"tc_assignment_sweep_removed,omitempty"`
+	TCAssignmentSweepMissing      uint64     `json:"tc_assignment_sweep_missing,omitempty"`
+	TCAssignmentSweepSuperseded   uint64     `json:"tc_assignment_sweep_superseded,omitempty"`
+	TCAssignmentSweepInFlight     uint64     `json:"tc_assignment_sweep_in_flight,omitempty"`
 	TCAssignmentSweepComplete     bool       `json:"tc_assignment_sweep_complete"`
 	TCAssignmentSweepEntries      uint64     `json:"tc_assignment_sweep_entries,omitempty"`
 	TCAssignmentSweepCapacity     uint64     `json:"tc_assignment_sweep_capacity,omitempty"`
@@ -426,6 +429,9 @@ func diagnosticsForAPI(diagnostics EBPFDiagnostics) adapter.EBPFRuntimeDiagnosti
 		TCAssignmentSweepFailureMap:   diagnostics.TCAssignmentSweepFailureMap,
 		TCAssignmentSweepScanned:      diagnostics.TCAssignmentSweepScanned,
 		TCAssignmentSweepRemoved:      diagnostics.TCAssignmentSweepRemoved,
+		TCAssignmentSweepMissing:      diagnostics.TCAssignmentSweepMissing,
+		TCAssignmentSweepSuperseded:   diagnostics.TCAssignmentSweepSuperseded,
+		TCAssignmentSweepInFlight:     diagnostics.TCAssignmentSweepInFlight,
 		TCAssignmentSweepComplete:     diagnostics.TCAssignmentSweepComplete,
 		TCAssignmentSweepEntries:      diagnostics.TCAssignmentSweepEntries,
 		TCAssignmentSweepCapacity:     diagnostics.TCAssignmentSweepCapacity,
@@ -739,6 +745,9 @@ func (i *Inbound) Diagnostics() EBPFDiagnostics {
 	diagnostics.TCNetworkGeneration = i.networkGeneration
 	diagnostics.TCAssignmentSweepScanned = i.tcAssignmentSweepScanned.Load()
 	diagnostics.TCAssignmentSweepRemoved = i.tcAssignmentSweepRemoved.Load()
+	diagnostics.TCAssignmentSweepMissing = i.tcAssignmentSweepMissing.Load()
+	diagnostics.TCAssignmentSweepSuperseded = i.tcAssignmentSweepSuperseded.Load()
+	diagnostics.TCAssignmentSweepInFlight = i.tcAssignmentSweepInFlight.Load()
 	diagnostics.TCAssignmentSweepComplete = i.tcAssignmentSweepComplete.Load()
 	diagnostics.TCAssignmentSweepEntries = i.tcAssignmentSweepEntries.Load()
 	diagnostics.TCReturnSweepEntries = i.tcReturnSweepEntries.Load()

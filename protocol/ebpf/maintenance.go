@@ -268,6 +268,9 @@ func (i *Inbound) recordTCAssignmentSweep(result commonEBPF.TCAssignmentSweepRes
 	}
 	i.tcAssignmentSweepScanned.Add(uint64(result.Scanned))
 	i.tcAssignmentSweepRemoved.Add(uint64(result.Removed))
+	i.tcAssignmentSweepMissing.Add(uint64(result.Missing))
+	i.tcAssignmentSweepSuperseded.Add(uint64(result.Superseded))
+	i.tcAssignmentSweepInFlight.Add(uint64(result.InFlight))
 	i.tcAssignmentSweepRuns.Add(1)
 	i.tcAssignmentSweepFailure.Store(result.Failure)
 	i.tcAssignmentSweepComplete.Store(result.Complete)

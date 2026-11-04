@@ -7942,6 +7942,9 @@ type EBPFInboundDiagnostics struct {
 	TcReturnSweepUsageKnown       bool                           `protobuf:"varint,79,opt,name=tcReturnSweepUsageKnown,proto3" json:"tcReturnSweepUsageKnown,omitempty"`
 	TcAssignmentSweepFailureMap   string                         `protobuf:"bytes,80,opt,name=tcAssignmentSweepFailureMap,proto3" json:"tcAssignmentSweepFailureMap,omitempty"`
 	TcRoutingSlot                 int32                          `protobuf:"varint,81,opt,name=tcRoutingSlot,proto3" json:"tcRoutingSlot,omitempty"`
+	TcAssignmentSweepMissing      uint64                         `protobuf:"varint,82,opt,name=tcAssignmentSweepMissing,proto3" json:"tcAssignmentSweepMissing,omitempty"`
+	TcAssignmentSweepSuperseded   uint64                         `protobuf:"varint,83,opt,name=tcAssignmentSweepSuperseded,proto3" json:"tcAssignmentSweepSuperseded,omitempty"`
+	TcAssignmentSweepInFlight     uint64                         `protobuf:"varint,84,opt,name=tcAssignmentSweepInFlight,proto3" json:"tcAssignmentSweepInFlight,omitempty"`
 	unknownFields                 protoimpl.UnknownFields
 	sizeCache                     protoimpl.SizeCache
 }
@@ -8490,6 +8493,27 @@ func (x *EBPFInboundDiagnostics) GetTcAssignmentSweepFailureMap() string {
 func (x *EBPFInboundDiagnostics) GetTcRoutingSlot() int32 {
 	if x != nil {
 		return x.TcRoutingSlot
+	}
+	return 0
+}
+
+func (x *EBPFInboundDiagnostics) GetTcAssignmentSweepMissing() uint64 {
+	if x != nil {
+		return x.TcAssignmentSweepMissing
+	}
+	return 0
+}
+
+func (x *EBPFInboundDiagnostics) GetTcAssignmentSweepSuperseded() uint64 {
+	if x != nil {
+		return x.TcAssignmentSweepSuperseded
+	}
+	return 0
+}
+
+func (x *EBPFInboundDiagnostics) GetTcAssignmentSweepInFlight() uint64 {
+	if x != nil {
+		return x.TcAssignmentSweepInFlight
 	}
 	return 0
 }
@@ -9824,7 +9848,7 @@ const file_daemon_started_service_proto_rawDesc = "" +
 	"\bcategory\x18\f \x01(\tR\bcategory\x12$\n" +
 	"\roccupancyMode\x18\r \x01(\tR\roccupancyMode\x12\"\n" +
 	"\fevictionMode\x18\x0e \x01(\tR\fevictionMode\x12,\n" +
-	"\x11admissionCritical\x18\x0f \x01(\bR\x11admissionCritical\"\xff\x1f\n" +
+	"\x11admissionCritical\x18\x0f \x01(\bR\x11admissionCritical\"\xbb!\n" +
 	"\x16EBPFInboundDiagnostics\x12\x1e\n" +
 	"\n" +
 	"observedAt\x18\x02 \x01(\x03R\n" +
@@ -9902,7 +9926,10 @@ const file_daemon_started_service_proto_rawDesc = "" +
 	"\x1btcAssignmentSweepUsageKnown\x18N \x01(\bR\x1btcAssignmentSweepUsageKnown\x128\n" +
 	"\x17tcReturnSweepUsageKnown\x18O \x01(\bR\x17tcReturnSweepUsageKnown\x12@\n" +
 	"\x1btcAssignmentSweepFailureMap\x18P \x01(\tR\x1btcAssignmentSweepFailureMap\x12$\n" +
-	"\rtcRoutingSlot\x18Q \x01(\x05R\rtcRoutingSlotB\x0e\n" +
+	"\rtcRoutingSlot\x18Q \x01(\x05R\rtcRoutingSlot\x12:\n" +
+	"\x18tcAssignmentSweepMissing\x18R \x01(\x04R\x18tcAssignmentSweepMissing\x12@\n" +
+	"\x1btcAssignmentSweepSuperseded\x18S \x01(\x04R\x1btcAssignmentSweepSuperseded\x12<\n" +
+	"\x19tcAssignmentSweepInFlight\x18T \x01(\x04R\x19tcAssignmentSweepInFlightB\x0e\n" +
 	"\f_lastErrorAtB\x11\n" +
 	"\x0f_lastRecoveryAtB\x0e\n" +
 	"\f_nextRetryAtB\x16\n" +

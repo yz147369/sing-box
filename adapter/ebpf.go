@@ -104,6 +104,9 @@ type EBPFRuntimeDiagnostics struct {
 	TCAssignmentSweepFailureMap   string
 	TCAssignmentSweepScanned      uint64
 	TCAssignmentSweepRemoved      uint64
+	TCAssignmentSweepMissing      uint64
+	TCAssignmentSweepSuperseded   uint64
+	TCAssignmentSweepInFlight     uint64
 	TCAssignmentSweepComplete     bool
 	TCAssignmentSweepEntries      uint64
 	TCAssignmentSweepCapacity     uint64

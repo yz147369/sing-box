@@ -143,6 +143,9 @@ type Inbound struct {
 	tcAssignmentSweepFailureMap   atomic.Value
 	tcAssignmentSweepScanned      atomic.Uint64
 	tcAssignmentSweepRemoved      atomic.Uint64
+	tcAssignmentSweepMissing      atomic.Uint64
+	tcAssignmentSweepSuperseded   atomic.Uint64
+	tcAssignmentSweepInFlight     atomic.Uint64
 	tcAssignmentSweepComplete     atomic.Bool
 	tcAssignmentSweepEntries      atomic.Uint64
 	tcAssignmentSweepCapacity     atomic.Uint64
