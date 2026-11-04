@@ -157,6 +157,11 @@ For local cgroup, also record the effective runtime fields returned by the API:
 `local_udp_time_mode`. These describe the path actually selected after vendor
 kernel and security-policy fallbacks; they are not capability guesses.
 
+`local_udp_storage_mode` is `socket_storage` when the cgroup backend can bind
+connected TCP/UDP peer state to `BPF_MAP_TYPE_SK_STORAGE` and the socket-release
+hook is active. On kernels without both capabilities it is `lru`; this is the
+bounded compatibility path.
+
 When local socket assignment or shared `socket_assign` is enabled, the API also reports `tc_*`
 runtime fields: the effective `tcx`/`clsact`/`mixed` attachment mechanism,
 `sockmap`/`direct` TCP listener lookup, delivery interface and ifindex, policy

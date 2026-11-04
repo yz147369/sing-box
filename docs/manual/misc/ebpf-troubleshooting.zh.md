@@ -135,6 +135,10 @@ local cgroup 还应记录 API 返回的实际运行字段：`local_cgroup_attach
 `local_udp_storage_mode` 和 `local_udp_time_mode`。这些字段表示厂商内核或安全策略
 触发回退后真正选中的路径，不是能力猜测。
 
+当内核同时支持 `BPF_MAP_TYPE_SK_STORAGE` 和 socket-release hook 时，
+`local_udp_storage_mode` 会显示为 `socket_storage`，连接 TCP/UDP 的 peer
+状态随 socket 生命周期保存；不具备这两项能力时显示 `lru`，使用受配置容量限制的兼容路径。
+
 local socket assignment 或 shared `socket_assign` 启用时，API 还会返回 `tc_*` 运行态字段：实际
 `tcx`/`clsact`/`mixed` 挂载机制、TCP listener 的 `sockmap`/`direct` 查找方式、delivery
 接口及其 ifindex、策略路由 mark/table/priority 与 TC 路由槽位、活动和待回收资源数量、健康状态、最近
