@@ -153,12 +153,12 @@ func TestEBPFDiagnosticsIncludesEffectiveTCState(t *testing.T) {
 }
 
 func TestEBPFDiagnosticsSchemaVersionIncludesEffectiveRuntimeFields(t *testing.T) {
-	if adapter.EBPFDiagnosticsSchemaVersion != 19 {
-		t.Fatalf("schema version = %d, want 19 after adding map metadata", adapter.EBPFDiagnosticsSchemaVersion)
+	if adapter.EBPFDiagnosticsSchemaVersion != 20 {
+		t.Fatalf("schema version = %d, want 20 after adding cgroup admission diagnostics", adapter.EBPFDiagnosticsSchemaVersion)
 	}
 	diagnostics := diagnosticsForAPI(EBPFDiagnostics{SchemaVersion: adapter.EBPFDiagnosticsSchemaVersion, LocalCgroupAttachMode: "link_create"})
-	if diagnostics.SchemaVersion != 19 {
-		t.Fatalf("diagnostics schema version = %d, want 19", diagnostics.SchemaVersion)
+	if diagnostics.SchemaVersion != 20 {
+		t.Fatalf("diagnostics schema version = %d, want 20", diagnostics.SchemaVersion)
 	}
 }
 
