@@ -10,16 +10,42 @@ import (
 )
 
 const (
-	tcAssignmentMaintenanceInterval  = time.Minute
-	tcAssignmentMaintenanceContinue  = 100 * time.Millisecond
-	tcAssignmentMaintenanceCooldown  = 5 * time.Second
-	tcAssignmentPressureCooldown     = time.Second
+	maintenanceMaxFailures           = 5
 	tcAssignmentPressureMaxIdle      = 15 * time.Second
 	tcAssignmentNormalMaxIdle        = 2 * time.Minute
 	tcAssignmentMaintenanceBudget    = 1024
 	tcAssignmentPressureEnterPercent = 70
 	tcAssignmentPressureExitPercent  = 50
 	tcAssignmentPressureExitRounds   = 3
+)
+
+// maintenanceScheduleConfig makes the worker policy explicit at each call
+// site. TC assignment and shared rewrite use the same scheduler mechanics,
+// but keep independent watchdog and retry budgets so a future tuning change
+// cannot silently alter the other data plane.
+type maintenanceScheduleConfig struct {
+	watchdog     time.Duration
+	continuation time.Duration
+	cooldown     time.Duration
+	pressure     time.Duration
+	maxFailures  uint
+}
+
+var (
+	tcAssignmentMaintenanceSchedule = maintenanceScheduleConfig{
+		watchdog:     time.Minute,
+		continuation: 100 * time.Millisecond,
+		cooldown:     5 * time.Second,
+		pressure:     time.Second,
+		maxFailures:  maintenanceMaxFailures,
+	}
+	sharedFlowMaintenanceSchedule = maintenanceScheduleConfig{
+		watchdog:     time.Minute,
+		continuation: 100 * time.Millisecond,
+		cooldown:     5 * time.Second,
+		pressure:     time.Second,
+		maxFailures:  maintenanceMaxFailures,
+	}
 )
 
 type mapPressureHysteresis struct {
@@ -86,6 +112,10 @@ type maintenanceJob struct {
 	continuation <-chan time.Time
 }
 
+func newMaintenanceJob(config maintenanceScheduleConfig) maintenanceJob {
+	return maintenanceJob{schedule: maintenanceSchedule{config: config}}
+}
+
 func (j *maintenanceJob) reset(delay time.Duration) {
 	resetMaintenanceTimer(&j.timer, &j.continuation, delay)
 }
@@ -108,6 +138,7 @@ func (j *maintenanceJob) stop() {
 // One instance belongs to the active worker, whether standalone or shared.
 // Wakeups coalesce until the deadline; traffic never postpones that deadline.
 type maintenanceSchedule struct {
+	config   maintenanceScheduleConfig
 	next     time.Time
 	failures uint
 }
@@ -117,16 +148,16 @@ func (s *maintenanceSchedule) delay(now time.Time) time.Duration {
 }
 
 func (s *maintenanceSchedule) finish(now time.Time, complete, pressure bool, err error) time.Duration {
-	delay := tcAssignmentMaintenanceCooldown
+	delay := s.config.cooldown
 	if err != nil {
-		s.failures = min(s.failures+1, 5)
-		delay = min(tcAssignmentMaintenanceCooldown<<(s.failures-1), tcAssignmentMaintenanceInterval)
+		s.failures = min(s.failures+1, s.config.maxFailures)
+		delay = min(s.config.cooldown<<(s.failures-1), s.config.watchdog)
 	} else if !complete {
 		s.failures = 0
-		delay = tcAssignmentMaintenanceContinue
+		delay = s.config.continuation
 	} else if pressure {
 		s.failures = 0
-		delay = tcAssignmentPressureCooldown
+		delay = s.config.pressure
 	} else {
 		s.failures = 0
 	}
@@ -190,9 +221,9 @@ func (i *Inbound) requestTCAssignmentMaintenance() {
 
 func (i *Inbound) runTCAssignmentJanitor(ctx context.Context, done chan<- struct{}) {
 	defer close(done)
-	ticker := time.NewTicker(tcAssignmentMaintenanceInterval)
+	ticker := time.NewTicker(tcAssignmentMaintenanceSchedule.watchdog)
 	defer ticker.Stop()
-	var job maintenanceJob
+	job := newMaintenanceJob(tcAssignmentMaintenanceSchedule)
 	for {
 		// Leave one wake queued during a cooldown/continuation instead of
 		// waking this goroutine and resetting its timer for every UDP packet.

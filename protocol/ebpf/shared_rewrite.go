@@ -267,11 +267,11 @@ func (s *sharedRewrite) stopFlowJanitor() {
 
 func (s *sharedRewrite) runFlowJanitor(ctx context.Context, done chan<- struct{}) {
 	defer close(done)
-	tcTicker := time.NewTicker(tcAssignmentMaintenanceInterval)
+	tcTicker := time.NewTicker(tcAssignmentMaintenanceSchedule.watchdog)
 	defer tcTicker.Stop()
 	// Independent jobs share scheduling semantics, never one another's state.
-	var tcJob maintenanceJob
-	var flowJob maintenanceJob
+	tcJob := newMaintenanceJob(tcAssignmentMaintenanceSchedule)
+	flowJob := newMaintenanceJob(sharedFlowMaintenanceSchedule)
 	defer func() {
 		tcJob.stop()
 		flowJob.stop()

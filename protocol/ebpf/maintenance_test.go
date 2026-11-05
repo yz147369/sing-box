@@ -12,30 +12,30 @@ import (
 
 func TestTCMaintenanceCoalescesEventsAndContinuesPartialScans(t *testing.T) {
 	now := time.Unix(1, 0)
-	var schedule maintenanceSchedule
+	schedule := maintenanceSchedule{config: tcAssignmentMaintenanceSchedule}
 	if schedule.delay(now) != 0 || schedule.finish(now, true, false, nil) != 0 {
 		t.Fatal("normal completed sweep should wait for activity or watchdog")
 	}
 	for n := 1; n < 50; n++ {
 		elapsed := time.Duration(n) * 100 * time.Millisecond
-		if got := schedule.delay(now.Add(elapsed)); got != tcAssignmentMaintenanceCooldown-elapsed {
+		if got := schedule.delay(now.Add(elapsed)); got != tcAssignmentMaintenanceSchedule.cooldown-elapsed {
 			t.Fatalf("wake %d postponed deadline: %v", n, got)
 		}
 	}
-	now = now.Add(tcAssignmentMaintenanceCooldown)
+	now = now.Add(tcAssignmentMaintenanceSchedule.cooldown)
 	if schedule.delay(now) != 0 {
 		t.Fatal("pending event was not released")
 	}
-	if got := schedule.finish(now, false, false, nil); got != tcAssignmentMaintenanceContinue {
+	if got := schedule.finish(now, false, false, nil); got != tcAssignmentMaintenanceSchedule.continuation {
 		t.Fatalf("partial scan delay = %v", got)
 	}
-	if got := schedule.finish(now, true, true, nil); got != tcAssignmentPressureCooldown {
+	if got := schedule.finish(now, true, true, nil); got != tcAssignmentMaintenanceSchedule.pressure {
 		t.Fatalf("pressure delay = %v", got)
 	}
-	if schedule.finish(now, false, true, errors.New("scan failed")) != tcAssignmentMaintenanceCooldown || schedule.delay(now) != tcAssignmentMaintenanceCooldown {
+	if schedule.finish(now, false, true, errors.New("scan failed")) != tcAssignmentMaintenanceSchedule.cooldown || schedule.delay(now) != tcAssignmentMaintenanceSchedule.cooldown {
 		t.Fatal("scan failure must not cause a short-delay retry loop")
 	}
-	if schedule.finish(now, false, true, errors.New("scan failed")) != 2*tcAssignmentMaintenanceCooldown {
+	if schedule.finish(now, false, true, errors.New("scan failed")) != 2*tcAssignmentMaintenanceSchedule.cooldown {
 		t.Fatal("repeated failure must back off")
 	}
 }
