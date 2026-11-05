@@ -120,6 +120,10 @@ func (i *Inbound) startInbound() error {
 		SelfBypass:       i.selfBypass,
 		TrackProcess:     i.processTracker != nil,
 		ICMPEchoReply:    i.fakeIPICMPReply,
+		NetworkGeneration: uint32(i.currentNetworkGeneration()),
+	}
+	if backendConfig.NetworkGeneration == 0 {
+		backendConfig.NetworkGeneration = 1
 	}
 	if runtime.GOOS == "android" {
 		backendConfig.AssignmentCapacity = commonEBPF.CompactTCAssignmentCapacity
