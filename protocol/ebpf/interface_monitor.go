@@ -60,6 +60,15 @@ func (i *Inbound) InterfaceUpdated(ctx context.Context) {
 			i.interfaceWarnings.reconcile.warn(i.logger, "reset cgroup eBPF network state after network change: ", err)
 		}
 	}
+	if backend := i.tcBackend(); backend != nil {
+		generation := uint32(i.networkGeneration)
+		if generation == 0 {
+			generation = 1
+		}
+		if err := backend.SetNetworkGeneration(generation); err != nil {
+			i.interfaceWarnings.reconcile.warn(i.logger, "advance TC eBPF network generation after network change: ", err)
+		}
+	}
 }
 
 func (i *Inbound) currentNetworkGeneration() uint64 {
