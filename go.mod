@@ -4,7 +4,7 @@ go 1.25.5
 
 require (
 	filippo.io/age v1.3.1
-	github.com/CHIZI-0618/sing-ebpf v0.1.0-alpha.29.0.20261105051708-e94614be2097
+	github.com/CHIZI-0618/sing-ebpf v0.1.0-alpha.29.0.20261105081606-05c4c4d60b0b
 	github.com/anthropics/anthropic-sdk-go v1.26.0
 	github.com/caddyserver/certmagic v0.25.3-0.20260421143802-60d9d8b415d6
 	github.com/caddyserver/zerossl v0.1.5
