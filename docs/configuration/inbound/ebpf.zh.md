@@ -277,7 +277,7 @@ raw-IP、PPP/PPPoE 和受支持的隧道链路应使用 `socket_assign`。local 
 ### shared.bypass_exclude
 
 与 `local.bypass_exclude` 相同，但作用于 shared 数据面：这些 CIDR 前缀会在
-所有 shared bypass 决策之前被强制接管。每个地址族最多接受一个前缀，与 DNS
+所有 shared bypass 决策之前被强制接管。支持配置多个 IPv4 和 IPv6 前缀，与 DNS
 fake-ip 范围重叠的前缀会在启动时报错。
 
 ### shared.bypass_rule_set
@@ -320,8 +320,8 @@ fake-ip 范围重叠的前缀会在启动时报错。
 ## 策略顺序
 
 安全与服务流量绕过最先执行；随后 FakeIP 前缀强制接管；DNS 模式及 local UID/shared
-来源筛选早于端口、私网地址和各自数据面的规则集绕过。顶层兼容规则集会应用到所有
-已启用路径，路径级规则集策略仍彼此独立。shared 的 CIDR 与 MAC include 为或关系，
+来源筛选早于端口、私网地址和各自数据面的规则集绕过。路径级规则集策略彼此独立。
+shared 的 CIDR 与 MAC include 为或关系，
 任一 exclude 命中都优先绕过。
 
 ## 诊断

@@ -307,9 +307,9 @@ Bypasses private and special-use destinations. Default is `true`.
 ### shared.bypass_exclude
 
 Like `local.bypass_exclude`, but for the shared data plane: CIDR prefixes
-that are force-intercepted ahead of every shared bypass decision. At most one
-IPv4 and one IPv6 prefix is accepted, and a prefix that overlaps the DNS
-fake-ip range is rejected at startup.
+that are force-intercepted ahead of every shared bypass decision. Multiple IPv4
+and IPv6 prefixes are accepted; a prefix that overlaps the DNS fake-ip range
+is rejected at startup.
 
 ### shared.bypass_rule_set
 

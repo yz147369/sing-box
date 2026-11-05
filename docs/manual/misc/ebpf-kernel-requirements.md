@@ -6,8 +6,9 @@ icon: material/chip
 
 The eBPF inbound defaults to the cgroup v2 socket-address backend for local
 interception and TC `packet_rewrite` for shared interception. Local interception
-may explicitly select TC, while shared interception may explicitly select the
-tuple-preserving `socket_assign` data plane instead.
+may explicitly select the tuple-preserving `socket_assign` data plane; shared
+interception may select the same data plane instead of the default
+`packet_rewrite` path.
 Support is determined by runtime map, program-load, helper, and attachment results
 rather than a minimum Linux version. Vendor kernels may backport, disable, or
 restrict individual facilities. The LPM-trie safety exception described below
