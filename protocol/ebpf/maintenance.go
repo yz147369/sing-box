@@ -76,6 +76,35 @@ func resetMaintenanceTimer(timer **time.Timer, continuation *<-chan time.Time, d
 	*continuation = (*timer).C
 }
 
+// maintenanceJob owns the timer and continuation channel for one bounded
+// maintenance stream. TC assignments and shared packet-rewrite flows use the
+// same lifecycle rules, while retaining independent schedules and pressure
+// state.
+type maintenanceJob struct {
+	schedule     maintenanceSchedule
+	timer        *time.Timer
+	continuation <-chan time.Time
+}
+
+func (j *maintenanceJob) reset(delay time.Duration) {
+	resetMaintenanceTimer(&j.timer, &j.continuation, delay)
+}
+
+func (j *maintenanceJob) finish(now time.Time, complete, pressure bool, err error) {
+	if delay := j.schedule.finish(now, complete, pressure, err); delay > 0 {
+		j.reset(delay)
+	} else {
+		j.stop()
+	}
+}
+
+func (j *maintenanceJob) stop() {
+	if j.timer != nil {
+		j.timer.Stop()
+	}
+	j.continuation = nil
+}
+
 // One instance belongs to the active worker, whether standalone or shared.
 // Wakeups coalesce until the deadline; traffic never postpones that deadline.
 type maintenanceSchedule struct {
@@ -108,20 +137,13 @@ func (s *maintenanceSchedule) finish(now time.Time, complete, pressure bool, err
 	return 0
 }
 
-func (i *Inbound) maintainTCAssignments(schedule *maintenanceSchedule, timer **time.Timer, continuation *<-chan time.Time) {
-	if delay := schedule.delay(time.Now()); delay > 0 {
-		resetMaintenanceTimer(timer, continuation, delay)
+func (i *Inbound) maintainTCAssignments(job *maintenanceJob) {
+	if delay := job.schedule.delay(time.Now()); delay > 0 {
+		job.reset(delay)
 		return
 	}
 	complete, err := i.sweepTCAssignmentMaintenance()
-	if delay := schedule.finish(time.Now(), complete, i.tcAssignmentSweepPressure.Load(), err); delay > 0 {
-		resetMaintenanceTimer(timer, continuation, delay)
-	} else {
-		if *timer != nil {
-			(*timer).Stop()
-		}
-		*continuation = nil
-	}
+	job.finish(time.Now(), complete, i.tcAssignmentSweepPressure.Load(), err)
 }
 
 // startTCAssignmentJanitor owns the TC assignment side of the same bounded
@@ -170,28 +192,24 @@ func (i *Inbound) runTCAssignmentJanitor(ctx context.Context, done chan<- struct
 	defer close(done)
 	ticker := time.NewTicker(tcAssignmentMaintenanceInterval)
 	defer ticker.Stop()
-	var continuation <-chan time.Time
-	var timer *time.Timer
-	var schedule maintenanceSchedule
+	var job maintenanceJob
 	for {
 		// Leave one wake queued during a cooldown/continuation instead of
 		// waking this goroutine and resetting its timer for every UDP packet.
 		var wake <-chan struct{}
-		if continuation == nil {
+		if job.continuation == nil {
 			wake = i.tcAssignmentWake
 		}
 		select {
 		case <-ctx.Done():
-			if timer != nil {
-				timer.Stop()
-			}
+			job.stop()
 			return
 		case <-wake:
 		case <-ticker.C:
-		case <-continuation:
-			continuation = nil
+		case <-job.continuation:
+			job.continuation = nil
 		}
-		i.maintainTCAssignments(&schedule, &timer, &continuation)
+		i.maintainTCAssignments(&job)
 	}
 }
 

@@ -269,20 +269,12 @@ func (s *sharedRewrite) runFlowJanitor(ctx context.Context, done chan<- struct{}
 	defer close(done)
 	tcTicker := time.NewTicker(tcAssignmentMaintenanceInterval)
 	defer tcTicker.Stop()
-	var tcContinuation <-chan time.Time
-	var tcTimer *time.Timer
-	var tcSchedule maintenanceSchedule
 	// Independent jobs share scheduling semantics, never one another's state.
-	var flowSchedule maintenanceSchedule
-	var flowTimer *time.Timer
-	var flowContinuation <-chan time.Time
+	var tcJob maintenanceJob
+	var flowJob maintenanceJob
 	defer func() {
-		if tcTimer != nil {
-			tcTimer.Stop()
-		}
-		if flowTimer != nil {
-			flowTimer.Stop()
-		}
+		tcJob.stop()
+		flowJob.stop()
 	}()
 	tcMaintenancePending := false
 	var releaseTimer *time.Timer
@@ -326,7 +318,7 @@ func (s *sharedRewrite) runFlowJanitor(ctx context.Context, done chan<- struct{}
 			flowWake = backend.TCPFlowWake()
 		}
 		var tcWake <-chan struct{}
-		if tcContinuation == nil {
+		if tcJob.continuation == nil {
 			tcWake = s.inbound.tcAssignmentWake
 		}
 		sweepRequested := false
@@ -350,17 +342,17 @@ func (s *sharedRewrite) runFlowJanitor(ctx context.Context, done chan<- struct{}
 			tcMaintenancePending = true
 			// Kernel-only allocations do not appear in KnownFlowUsage and may
 			// never produce a userspace wake. Keep a bounded orphan watchdog.
-			sweepRequested = flowContinuation == nil
-		case <-tcContinuation:
-			tcContinuation = nil
+			sweepRequested = flowJob.continuation == nil
+		case <-tcJob.continuation:
+			tcJob.continuation = nil
 			tcMaintenancePending = true
 		case <-releaseTimerChannel:
-		case <-flowContinuation:
-			flowContinuation = nil
+		case <-flowJob.continuation:
+			flowJob.continuation = nil
 			sweepRequested = true
 		}
 		if tcMaintenancePending {
-			s.inbound.maintainTCAssignments(&tcSchedule, &tcTimer, &tcContinuation)
+			s.inbound.maintainTCAssignments(&tcJob)
 			tcMaintenancePending = false
 		}
 		if backend == nil {
@@ -368,9 +360,9 @@ func (s *sharedRewrite) runFlowJanitor(ctx context.Context, done chan<- struct{}
 		}
 		now := time.Now()
 		if sweepRequested {
-			if delay := flowSchedule.delay(now); delay > 0 {
-				if flowContinuation == nil {
-					resetMaintenanceTimer(&flowTimer, &flowContinuation, delay)
+			if delay := flowJob.schedule.delay(now); delay > 0 {
+				if flowJob.continuation == nil {
+					flowJob.reset(delay)
 				}
 				sweepRequested = false
 			}
@@ -412,7 +404,7 @@ func (s *sharedRewrite) runFlowJanitor(ctx context.Context, done chan<- struct{}
 		} else {
 			scanInProgress = !result.Complete
 			if !result.Complete {
-				resetMaintenanceTimer(&flowTimer, &flowContinuation, flowSchedule.finish(time.Now(), false, pressure, nil))
+				flowJob.finish(time.Now(), false, pressure, nil)
 				continue
 			}
 			entered, exited := false, false
@@ -438,9 +430,7 @@ func (s *sharedRewrite) runFlowJanitor(ctx context.Context, done chan<- struct{}
 				}))
 			}
 		}
-		if delay := flowSchedule.finish(time.Now(), result.Complete, pressure, err); delay > 0 {
-			resetMaintenanceTimer(&flowTimer, &flowContinuation, delay)
-		}
+		flowJob.finish(time.Now(), result.Complete, pressure, err)
 	}
 }
 
